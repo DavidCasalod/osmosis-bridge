@@ -1,6 +1,7 @@
 package chainclients
 
 import (
+	"osmosis_bridge/bridge/common"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -12,7 +13,7 @@ import (
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/shared/types"
 	"gitlab.com/thorchain/thornode/bifrost/pubkeymanager"
 	"gitlab.com/thorchain/thornode/bifrost/thorclient"
-	"gitlab.com/thorchain/thornode/common"
+
 	"gitlab.com/thorchain/thornode/config"
 )
 
@@ -36,8 +37,10 @@ func LoadChains(thorKeys *thorclient.Keys,
 
 	loadChain := func(chain config.BifrostChainConfiguration) (ChainClient, error) {
 
-		switch chain.ChainID {
+		switch common.Chain(chain.ChainID) {
 
+		case common.OSMOSISChain:
+			return gaia.NewCosmosClient(thorKeys, chain, server, thorchainBridge, m)
 		case common.GAIAChain:
 			return gaia.NewCosmosClient(thorKeys, chain, server, thorchainBridge, m)
 		case common.BTCChain:
@@ -58,17 +61,17 @@ func LoadChains(thorKeys *thorclient.Keys,
 		client, err := loadChain(chain)
 		if err != nil {
 			logger.Error().Err(err).Stringer("chain", chain.ChainID).Msg("failed to load chain")
-			failedChains = append(failedChains, chain.ChainID)
+			failedChains = append(failedChains, common.Chain(chain.ChainID))
 			continue
 		}
 
 		// trunk-ignore-all(golangci-lint/forcetypeassert)
-		switch chain.ChainID {
+		switch common.Chain(chain.ChainID) {
 		case common.BTCChain:
 			pubKeyValidator.RegisterCallback(client.(*bitcoin.Client).RegisterPublicKey)
 
 		}
-		chains[chain.ChainID] = client
+		chains[common.Chain(chain.ChainID)] = client
 	}
 
 	// watch failed chains minutely and restart bifrost if any succeed init

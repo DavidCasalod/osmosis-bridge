@@ -1,5 +1,6 @@
 # Osmosis-Thornode
-In this GitHub repository, there are 2 approaches. Within the local net folder, you will find the necessary code to create and launch a mock network, allowing you to work in a development environment. Inside the bridge folder is the modified bifrost code aiming to achieve communication between BTC and Osmosis. It also integrates with gaia since it's the only one within cosmos that, so far, allows working with ATOM to BTC and vice versa.
+In this GitHub repository, there are 2 approaches. Within the local net folder, you will find the necessary code to create and launch a mock network, allowing you to work in a development environment. Inside the bridge folder is the modified bifrost code aiming to achieve communication between BTC and Osmosis, For now, I've focused on establishing the connection between ThorNode and Osmosis, with the intention of later trying to establish the Osmosis to Bitcoin connection. Inside the 'bridge' folder, there is a Readme.md with further explanation.
+It also integrates with gaia since it's the only one within cosmos that, so far, allows working with ATOM to BTC and vice versa.
 
 Below is an explanation of how to work with the local net to make different transactions.
 
