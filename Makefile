@@ -5,7 +5,7 @@ cli-mocknet:
 	@docker compose -f local_net/build/docker/docker-compose.yml run --rm cli
 
 run-mocknet:
-	@docker compose -f local_net/build/docker/docker-compose.yml --profile mocknet --profile midgard up -d
+	@docker compose -f local_net/build/docker/docker-compose-2chains.yml --profile mocknet --profile midgard up -d
 
 stop-mocknet:
 	@docker compose -f local_net/build/docker/docker-compose.yml --profile mocknet --profile midgard down -v
