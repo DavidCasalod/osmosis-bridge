@@ -235,7 +235,7 @@ func (c Chain) AddressPrefix(cn ChainNetwork) string {
 			return btypes.TestNetwork.Bech32Prefixes()
 		case TERRAChain:
 			return "terra"
-		case GAIAChain:
+		case GAIAChain, OSMOSISChain:
 			return "cosmos"
 		case THORChain:
 			// TODO update this to use testnet address prefix
@@ -253,7 +253,7 @@ func (c Chain) AddressPrefix(cn ChainNetwork) string {
 			return btypes.TestNetwork.Bech32Prefixes()
 		case TERRAChain:
 			return "terra"
-		case GAIAChain:
+		case GAIAChain, OSMOSISChain:
 			return "cosmos"
 		case THORChain:
 			// TODO update this to use testnet address prefix
@@ -271,7 +271,7 @@ func (c Chain) AddressPrefix(cn ChainNetwork) string {
 			return btypes.ProdNetwork.Bech32Prefixes()
 		case TERRAChain:
 			return "terra"
-		case GAIAChain:
+		case GAIAChain, OSMOSISChain:
 			return "cosmos"
 		case THORChain:
 			return types.GetConfig().GetBech32AccountAddrPrefix()

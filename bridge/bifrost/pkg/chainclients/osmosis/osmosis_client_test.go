@@ -12,6 +12,8 @@ import (
 
 	"osmosis_bridge/bridge/common"
 
+	stypes "osmosis_bridge/bridge/bifrost/thorclient/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
@@ -23,7 +25,6 @@ import (
 	btypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
 	"gitlab.com/thorchain/thornode/bifrost/thorclient"
-	stypes "gitlab.com/thorchain/thornode/bifrost/thorclient/types"
 	"gitlab.com/thorchain/thornode/cmd"
 	thorCommon "gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
@@ -150,12 +151,12 @@ func (s *CosmosTestSuite) TestProcessOutboundTx(c *C) {
 	toAddress, err := common.NewAddress("cosmos10tjz4ave7znpctgd2rfu6v2r6zkeup2dlmqtuz")
 	c.Assert(err, IsNil)
 	txOut := stypes.TxOutItem{
-		Chain:       ConvertChain(common.OSMOSISChain),
-		ToAddress:   thorCommon.Address(toAddress),
-		VaultPubKey: thorCommon.PubKey(vaultPubKey),
-		Coins:       ConvertToThorCoins(common.Coins{common.NewCoin(outAsset, cosmos.NewUint(24528352))}),
+		Chain:       common.OSMOSISChain,
+		ToAddress:   toAddress,
+		VaultPubKey: vaultPubKey,
+		Coins:       (common.Coins{common.NewCoin(outAsset, cosmos.NewUint(24528352))}),
 		Memo:        "memo",
-		MaxGas:      thorCommon.Gas{thorCommon.NewCoin(ConvertToThorAsset(outAsset), cosmos.NewUint(235824))},
+		MaxGas:      common.Gas{common.NewCoin(outAsset, cosmos.NewUint(235824))},
 		GasRate:     750000,
 		InHash:      "hash",
 	}
@@ -218,12 +219,12 @@ func (s *CosmosTestSuite) TestSign(c *C) {
 	toAddress, err := common.NewAddress("cosmos10tjz4ave7znpctgd2rfu6v2r6zkeup2dlmqtuz")
 	c.Assert(err, IsNil)
 	txOut := stypes.TxOutItem{
-		Chain:       ConvertChain(common.OSMOSISChain),
-		ToAddress:   thorCommon.Address(toAddress),
-		VaultPubKey: thorCommon.PubKey(vaultPubKey),
-		Coins:       ConvertToThorCoins(common.Coins{common.NewCoin(outAsset, cosmos.NewUint(24528352))}),
+		Chain:       (common.OSMOSISChain),
+		ToAddress:   toAddress,
+		VaultPubKey: vaultPubKey,
+		Coins:       common.Coins{common.NewCoin(outAsset, cosmos.NewUint(24528352))},
 		Memo:        "memo",
-		MaxGas:      thorCommon.Gas{thorCommon.NewCoin(ConvertToThorAsset(outAsset), cosmos.NewUint(235824))},
+		MaxGas:      common.Gas{common.NewCoin(outAsset, cosmos.NewUint(235824))},
 		GasRate:     750000,
 		InHash:      "hash",
 	}
@@ -240,7 +241,7 @@ func (s *CosmosTestSuite) TestSign(c *C) {
 	txb, err := buildUnsigned(
 		txConfig,
 		msg,
-		thorCommon.PubKey(vaultPubKey),
+		vaultPubKey,
 		"memo",
 		gas,
 		uint64(meta.AccountNumber),

@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"osmosis_bridge/bridge/bifrost/blockscanner"
+	"osmosis_bridge/bridge/bifrost/thorclient/types"
 	"strconv"
 	"strings"
 	"time"
@@ -24,12 +26,12 @@ import (
 	tmtypes "github.com/tendermint/tendermint/proto/tendermint/types"
 	"google.golang.org/grpc"
 
-	"gitlab.com/thorchain/thornode/bifrost/blockscanner"
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/gaia/wasm"
 	"gitlab.com/thorchain/thornode/bifrost/thorclient"
-	"gitlab.com/thorchain/thornode/bifrost/thorclient/types"
+
 	"gitlab.com/thorchain/thornode/common"
+
 	"gitlab.com/thorchain/thornode/common/cosmos"
 	"gitlab.com/thorchain/thornode/config"
 )
@@ -195,7 +197,7 @@ func (c *CosmosBlockScanner) updateGasCache(tx ctypes.FeeTx) {
 
 	// only consider transactions with fee paid in uatom
 	coin, err := fromCosmosToThorchain(fees[0])
-	if err != nil || !coin.Asset.Equals(c.cfg.ChainID.GetGasAsset()) {
+	if err != nil || !coin.Asset.Equals(ConvertToOsmoAsset(c.cfg.ChainID.GetGasAsset())) {
 		return
 	}
 
@@ -340,7 +342,7 @@ func (c *CosmosBlockScanner) processTxs(height int64, rawTxs [][]byte) ([]types.
 						c.logger.Debug().Err(err).Interface("coins", c).Msg("unable to convert coin, not whitelisted. skipping...")
 						continue
 					}
-					coins = append(coins, cCoin)
+					coins = append(coins, ConvertToThorCoin(cCoin))
 				}
 
 				// Ignore the tx when no coins exist
@@ -356,7 +358,7 @@ func (c *CosmosBlockScanner) processTxs(height int64, rawTxs [][]byte) ([]types.
 						c.logger.Debug().Err(err).Interface("fees", fees).Msg("unable to convert coin, not whitelisted. skipping...")
 						continue
 					}
-					gasFees = append(gasFees, cCoin)
+					gasFees = append(gasFees, ConvertToThorCoin(cCoin))
 				}
 				// THORChain only supports gas paid in ATOM, if gas is paid in another asset
 				// then fake gas as `0.000001 ATOM`, the fee is not used but cannot be empty

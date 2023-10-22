@@ -1,6 +1,6 @@
 package blockscanner
 
-import "gitlab.com/thorchain/thornode/bifrost/thorclient/types"
+import "osmosis_bridge/bridge/bifrost/thorclient/types"
 
 type DummyFetcher struct {
 	Tx  types.TxIn

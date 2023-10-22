@@ -32,4 +32,12 @@ The main focus is to ensure the construction of an unsigned transaction, verify 
 Overall, the code tests various functionalities related to accounts, transactions, and cryptographic operations within the context of the osmosis package and associated Thorchain processes.
 
 Results:
-OOPS: 7 passed, 2 FAILED
+```sh
+=== RUN   TestPackage
+{"level":"info","module":"blockscanner","chain":"","block height":1,"time":"2023-10-22T11:17:32Z","message":"block scanner last fetch height"}
+OK: 9 passed
+--- PASS: TestPackage (2.67s)
+PASS
+ok      osmosis_bridge/bridge/bifrost/pkg/chainclients/osmosis  2.995s
+
+```

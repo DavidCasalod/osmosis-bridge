@@ -1,7 +1,8 @@
 package types
 
 import (
-	"gitlab.com/thorchain/thornode/common"
+	"osmosis_bridge/bridge/common"
+
 	cosmos "gitlab.com/thorchain/thornode/common/cosmos"
 	. "gopkg.in/check.v1"
 )

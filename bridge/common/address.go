@@ -16,7 +16,6 @@ import (
 	"github.com/gcash/bchutil"
 	ltcchaincfg "github.com/ltcsuite/ltcd/chaincfg"
 	"github.com/ltcsuite/ltcutil"
-
 	"gitlab.com/thorchain/thornode/common/cosmos"
 )
 
@@ -49,6 +48,7 @@ func NewAddress(address string) (Address, error) {
 	if err == nil {
 		return Address(address), nil
 	}
+	// Check address for OSMOSIS
 
 	// Check other BTC address formats with mainnet
 	_, err = btcutil.DecodeAddress(address, &chaincfg.MainNetParams)
@@ -246,7 +246,7 @@ func (addr Address) IsChain(chain Chain) bool {
 		prefix, _, _ := bech32.Decode(addr.String())
 		return prefix == "cosmos"
 	case OSMOSISChain:
-		// Note: Gaia does not use a special prefix for testnet
+		// Note: Osmosis does not use a special prefix for testnet
 		prefix, _, _ := bech32.Decode(addr.String())
 		return prefix == "cosmos"
 	case THORChain:

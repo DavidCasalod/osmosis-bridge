@@ -11,6 +11,10 @@ import (
 	"sync"
 	"time"
 
+	"osmosis_bridge/bridge/bifrost/blockscanner"
+	stypes "osmosis_bridge/bridge/bifrost/thorclient/types"
+	"osmosis_bridge/bridge/bifrost/tss"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -26,13 +30,12 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/tendermint/tendermint/crypto"
-	"gitlab.com/thorchain/thornode/bifrost/blockscanner"
+
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/shared/runners"
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/shared/signercache"
 	"gitlab.com/thorchain/thornode/bifrost/thorclient"
-	stypes "gitlab.com/thorchain/thornode/bifrost/thorclient/types"
-	"gitlab.com/thorchain/thornode/bifrost/tss"
+
 	thorCommon "gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
 	"gitlab.com/thorchain/thornode/config"
@@ -254,7 +257,7 @@ func (c *OsmosisClient) GetAccountByAddress(address string, _ *big.Int) (common.
 			c.logger.Err(err).Interface("balances", balances.Balances).Msg("wasn't able to convert coins that passed whitelist")
 			continue
 		}
-		nativeCoins = append(nativeCoins, ConvertToOsmCoin(coin))
+		nativeCoins = append(nativeCoins, coin)
 	}
 
 	authReq := &atypes.QueryAccountRequest{
@@ -280,7 +283,7 @@ func (c *OsmosisClient) GetAccountByAddress(address string, _ *big.Int) (common.
 }
 
 func (c *OsmosisClient) processOutboundTx(tx stypes.TxOutItem, thorchainHeight int64) (*btypes.MsgSend, error) {
-	fromAddr, err := tx.VaultPubKey.GetAddress(thorCommon.Chain(c.GetChain()))
+	fromAddr, err := tx.VaultPubKey.GetAddress(c.GetChain())
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert address (%s) to bech32: %w", tx.VaultPubKey.String(), err)
 	}
@@ -316,7 +319,7 @@ func (c *OsmosisClient) SignTx(tx stypes.TxOutItem, thorchainHeight int64) (sign
 				}
 
 				// key sign error forward the keysign blame to thorchain
-				txID, err := c.thorchainBridge.PostKeysignFailure(keysignError.Blame, thorchainHeight, tx.Memo, tx.Coins, tx.VaultPubKey)
+				txID, err := c.thorchainBridge.PostKeysignFailure(keysignError.Blame, thorchainHeight, tx.Memo, ConvertToThorCoins(tx.Coins), thorCommon.PubKey(tx.VaultPubKey))
 				if err != nil {
 					c.logger.Err(err).Msg("fail to post keysign failure to THORChain")
 					return
@@ -356,7 +359,7 @@ func (c *OsmosisClient) SignTx(tx stypes.TxOutItem, thorchainHeight int64) (sign
 	} else {
 		// Check if we have CosmosMetadata for the current block height before
 		// fetching it from the GRPC server
-		meta = c.accts.Get(tx.VaultPubKey)
+		meta = c.accts.Get(thorCommon.PubKey(tx.VaultPubKey))
 		if currentHeight > meta.BlockHeight {
 			acc, err := c.GetAccount(common.PubKey(tx.VaultPubKey), big.NewInt(0))
 			if err != nil {
@@ -370,7 +373,7 @@ func (c *OsmosisClient) SignTx(tx stypes.TxOutItem, thorchainHeight int64) (sign
 					SeqNumber:     acc.Sequence,
 					BlockHeight:   currentHeight,
 				}
-				c.accts.Set(tx.VaultPubKey, meta)
+				c.accts.Set(thorCommon.PubKey(tx.VaultPubKey), meta)
 			}
 		}
 	}
@@ -389,7 +392,7 @@ func (c *OsmosisClient) SignTx(tx stypes.TxOutItem, thorchainHeight int64) (sign
 		return nil, nil, nil, err
 	}
 
-	if !gasCoins[0].Asset.Equals(ConvertToThorAsset(c.GetChain().GetGasAsset())) {
+	if !gasCoins[0].Asset.Equals(c.GetChain().GetGasAsset()) {
 		err = errors.New("gas coin asset must match chain gas asset")
 		c.logger.Err(err).Interface("coin", gasCoins[0]).Msg(err.Error())
 		return nil, nil, nil, err
@@ -405,7 +408,7 @@ func (c *OsmosisClient) SignTx(tx stypes.TxOutItem, thorchainHeight int64) (sign
 	txBuilder, err := buildUnsigned(
 		c.txConfig,
 		msg,
-		tx.VaultPubKey,
+		common.PubKey(tx.VaultPubKey),
 		tx.Memo,
 		fee,
 		uint64(meta.AccountNumber),
@@ -514,7 +517,7 @@ func (c *OsmosisClient) BroadcastTx(tx stypes.TxOutItem, txBytes []byte) (string
 		return "", errors.New("broadcast msg failed")
 	}
 
-	c.accts.SeqInc(tx.VaultPubKey)
+	c.accts.SeqInc(thorCommon.PubKey(tx.VaultPubKey))
 	// Only add the transaction to signer cache when it is sure the transaction has been broadcast successfully.
 	// So for other scenario , like transaction already in mempool , invalid account sequence # , the transaction can be rescheduled , and retried
 	if broadcastRes.TxResponse.Code == errortypes.SuccessABCICode {
@@ -592,72 +595,5 @@ func (c *OsmosisClient) OnObservedTxIn(txIn stypes.TxInItem, blockHeight int64) 
 	}
 	if err := c.signerCacheManager.SetSigned(txIn.CacheHash(thorCommon.Chain(c.GetChain()), m.GetTxID().String()), txIn.Tx); err != nil {
 		c.logger.Err(err).Msg("fail to update signer cache")
-	}
-}
-
-func ConvertChains(chains common.Chains) thorCommon.Chains {
-	convertedChains := make(thorCommon.Chains, len(chains))
-	for i, chain := range chains {
-		convertedChains[i] = ConvertChain(chain)
-	}
-	return convertedChains
-}
-func ConvertToThorAsset(osmosisAsset common.Asset) thorCommon.Asset {
-	return thorCommon.Asset{
-		Chain:  thorCommon.Chain(osmosisAsset.Chain),
-		Symbol: thorCommon.Symbol(osmosisAsset.Symbol),
-		Ticker: thorCommon.Ticker(osmosisAsset.Ticker),
-		Synth:  osmosisAsset.Synth,
-	}
-}
-
-func ConvertToThorCoins(osmosisCoins common.Coins) thorCommon.Coins {
-	var thorCoins thorCommon.Coins
-	for _, coin := range osmosisCoins {
-		thorCoin := thorCommon.Coin{
-			Asset:    ConvertToThorAsset(coin.Asset),
-			Amount:   coin.Amount,
-			Decimals: coin.Decimals,
-		}
-		thorCoins = append(thorCoins, thorCoin)
-	}
-	return thorCoins
-}
-func ConvertToThorAccount(osmoAccount common.Account) thorCommon.Account {
-	return thorCommon.Account{
-		Sequence:      osmoAccount.Sequence,
-		AccountNumber: osmoAccount.AccountNumber,
-		Coins:         ConvertToThorCoins(osmoAccount.Coins),
-		HasMemoFlag:   osmoAccount.HasMemoFlag,
-	}
-}
-
-func ConvertToOsmCoins(osmosisCoins thorCommon.Coins) common.Coins {
-	var osmoCoins common.Coins
-	for _, coin := range osmosisCoins {
-		osmoCoin := common.Coin{
-			Asset:    ConvertToOsmoAsset(coin.Asset),
-			Amount:   coin.Amount,
-			Decimals: coin.Decimals,
-		}
-		osmoCoins = append(osmoCoins, osmoCoin)
-	}
-	return osmoCoins
-}
-
-func ConvertToOsmCoin(osmosisCoins thorCommon.Coin) common.Coin {
-	return common.Coin{
-		Asset:    ConvertToOsmoAsset(osmosisCoins.Asset),
-		Amount:   osmosisCoins.Amount,
-		Decimals: osmosisCoins.Decimals,
-	}
-}
-
-func ConvertToOsmoAsset(thorAsset thorCommon.Asset) common.Asset {
-	return common.Asset{
-		Chain:  common.Chain(thorAsset.Chain),
-		Symbol: common.Symbol(thorAsset.Symbol),
-		Ticker: common.Ticker(thorAsset.Ticker),
-		Synth:  thorAsset.Synth,
 	}
 }

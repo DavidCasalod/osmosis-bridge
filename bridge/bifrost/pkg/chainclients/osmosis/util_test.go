@@ -20,24 +20,24 @@ func (s *UtilTestSuite) TestFromCosmosToThorchain(c *C) {
 	c.Assert(err, IsNil)
 
 	// 5 ATOM, 8 decimals
-	expectedThorchainAsset, err := common.NewAsset("GAIA.ATOM")
+	expectedThorchainAsset, err := common.NewAsset("OSMOSIS.ATOM")
 	c.Assert(err, IsNil)
 	expectedThorchainAmount := ctypes.NewUint(500000000)
-	c.Check(thorchainCoin.Asset.Equals(expectedThorchainAsset), Equals, true)
+	c.Check(thorchainCoin.Asset.Equals(ConvertToOsmoAsset(expectedThorchainAsset)), Equals, true)
 	c.Check(thorchainCoin.Amount.BigInt().Int64(), Equals, expectedThorchainAmount.BigInt().Int64())
 	c.Check(thorchainCoin.Decimals, Equals, int64(6))
 }
 
 func (s *UtilTestSuite) TestFromThorchainToCosmos(c *C) {
-	// 6 GAIA.ATOM, 8 decimals
-	thorchainAsset, err := common.NewAsset("GAIA.ATOM")
+	// 6 OSMOSIS.ATOM, 8 decimals
+	thorchainAsset, err := common.NewAsset("OSMOSIS.ATOM")
 	c.Assert(err, IsNil)
 	thorchainCoin := common.Coin{
 		Asset:    thorchainAsset,
 		Amount:   cosmos.NewUint(600000000),
 		Decimals: 6,
 	}
-	cosmosCoin, err := fromThorchainToCosmos(thorchainCoin)
+	cosmosCoin, err := fromThorchainToCosmos(ConvertToOsmCoin(thorchainCoin))
 	c.Assert(err, IsNil)
 
 	// 6 uatom, 6 decimals

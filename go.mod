@@ -265,6 +265,7 @@ require (
 	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/kzahedi/goent v0.0.0-20190403094137-49773660fa36 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/osmosis-labs/bech32-ibc v0.1.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	golang.org/x/exp v0.0.0-20230206171751-46f607a40771 // indirect
 	gonum.org/v1/gonum v0.12.0 // indirect
