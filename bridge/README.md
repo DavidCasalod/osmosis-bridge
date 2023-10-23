@@ -34,10 +34,10 @@ Overall, the code tests various functionalities related to accounts, transaction
 Results:
 ```sh
 === RUN   TestPackage
-{"level":"info","module":"blockscanner","chain":"","block height":1,"time":"2023-10-22T11:17:32Z","message":"block scanner last fetch height"}
-OK: 9 passed
---- PASS: TestPackage (2.67s)
+{"level":"info","module":"blockscanner","chain":"","block height":1,"time":"2023-10-23T13:36:40Z","message":"block scanner last fetch height"}
+OK: 11 passed
+--- PASS: TestPackage (2.64s)
 PASS
-ok      osmosis_bridge/bridge/bifrost/pkg/chainclients/osmosis  2.995s
+ok      osmosis_bridge/bridge/bifrost/pkg/chainclients/osmosis  2.976s
 
 ```
