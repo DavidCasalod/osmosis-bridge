@@ -3,9 +3,9 @@ package types
 import (
 	"crypto/sha256"
 	"fmt"
+	"osmosis_bridge/bridge/common"
 	"strings"
 
-	"gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
 	mem "gitlab.com/thorchain/thornode/x/thorchain/memo"
 )

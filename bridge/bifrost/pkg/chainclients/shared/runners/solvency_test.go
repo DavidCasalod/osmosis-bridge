@@ -14,7 +14,9 @@ import (
 	. "gopkg.in/check.v1"
 
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
-	"gitlab.com/thorchain/thornode/bifrost/thorclient"
+
+	"osmosis_bridge/bridge/bifrost/thorclient"
+
 	"gitlab.com/thorchain/thornode/cmd"
 	"gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"

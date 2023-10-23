@@ -8,10 +8,6 @@ import (
 
 	"osmosis_bridge/bridge/common"
 
-	thorTypes "gitlab.com/thorchain/thornode/bifrost/thorclient/types"
-
-	stypes "osmosis_bridge/bridge/bifrost/thorclient/types"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	ctypes "github.com/cosmos/cosmos-sdk/types"
 	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
@@ -223,35 +219,35 @@ func ConvertToOsmoAsset(thorAsset thorCommon.Asset) common.Asset {
 	}
 }
 
-func ConvertToThorTxIn(txIn stypes.TxIn) thorTypes.TxIn {
-	var thorTxArray []thorTypes.TxInItem
-	for _, item := range txIn.TxArray {
-		thorTxArray = append(thorTxArray, ConvertTxInItem(item))
-	}
+// func ConvertToThorTxIn(txIn stypes.TxIn) thorTypes.TxIn {
+// 	var thorTxArray []thorTypes.TxInItem
+// 	for _, item := range txIn.TxArray {
+// 		thorTxArray = append(thorTxArray, ConvertTxInItem(item))
+// 	}
 
-	return thorTypes.TxIn{
-		Count:                txIn.Count,
-		Chain:                txIn.Chain,
-		TxArray:              thorTxArray,
-		Filtered:             txIn.Filtered,
-		MemPool:              txIn.MemPool,
-		SentUnFinalised:      txIn.SentUnFinalised,
-		Finalised:            txIn.Finalised,
-		ConfirmationRequired: txIn.ConfirmationRequired,
-	}
-}
-func ConvertTxInItem(item stypes.TxInItem) thorTypes.TxInItem {
-	return thorTypes.TxInItem{
-		BlockHeight:           item.BlockHeight,
-		Tx:                    item.Tx,
-		Memo:                  item.Memo,
-		Sender:                item.Sender,
-		To:                    item.To,
-		Coins:                 item.Coins,               // Assuming common.Coins is the same type for both
-		Gas:                   item.Gas,                 // Assuming common.Gas is the same type for both
-		ObservedVaultPubKey:   item.ObservedVaultPubKey, // Assuming common.PubKey is the same type for both
-		Aggregator:            item.Aggregator,
-		AggregatorTarget:      item.AggregatorTarget,
-		AggregatorTargetLimit: item.AggregatorTargetLimit, // Assuming cosmos.Uint is the same type for both
-	}
-}
+// 	return thorTypes.TxIn{
+// 		Count:                txIn.Count,
+// 		Chain:                txIn.Chain,
+// 		TxArray:              thorTxArray,
+// 		Filtered:             txIn.Filtered,
+// 		MemPool:              txIn.MemPool,
+// 		SentUnFinalised:      txIn.SentUnFinalised,
+// 		Finalised:            txIn.Finalised,
+// 		ConfirmationRequired: txIn.ConfirmationRequired,
+// 	}
+// }
+// func ConvertTxInItem(item stypes.TxInItem) thorTypes.TxInItem {
+// 	return thorTypes.TxInItem{
+// 		BlockHeight:           item.BlockHeight,
+// 		Tx:                    item.Tx,
+// 		Memo:                  item.Memo,
+// 		Sender:                item.Sender,
+// 		To:                    item.To,
+// 		Coins:                 item.Coins,               // Assuming common.Coins is the same type for both
+// 		Gas:                   item.Gas,                 // Assuming common.Gas is the same type for both
+// 		ObservedVaultPubKey:   item.ObservedVaultPubKey, // Assuming common.PubKey is the same type for both
+// 		Aggregator:            item.Aggregator,
+// 		AggregatorTarget:      item.AggregatorTarget,
+// 		AggregatorTargetLimit: item.AggregatorTargetLimit, // Assuming cosmos.Uint is the same type for both
+// 	}
+// }

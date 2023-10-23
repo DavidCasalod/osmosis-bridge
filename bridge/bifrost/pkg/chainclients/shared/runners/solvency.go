@@ -7,7 +7,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"gitlab.com/thorchain/thornode/bifrost/thorclient"
+	"osmosis_bridge/bridge/bifrost/thorclient"
+
 	"gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
 	"gitlab.com/thorchain/thornode/constants"

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"osmosis_bridge/bridge/bifrost/thorclient"
 	"sort"
 	"sync"
 	"time"
@@ -20,7 +21,6 @@ import (
 	"gitlab.com/thorchain/binance-sdk/types/tx"
 	"gitlab.com/thorchain/tss/go-tss/keysign"
 
-	"gitlab.com/thorchain/thornode/bifrost/thorclient"
 	"gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
 	"gitlab.com/thorchain/thornode/constants"

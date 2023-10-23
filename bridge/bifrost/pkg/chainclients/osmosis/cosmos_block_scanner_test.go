@@ -1,96 +1,96 @@
 package osmosis
 
-// import (
-// 	"fmt"
-// 	"io"
-// 	"net/http"
-// 	"net/http/httptest"
-// 	"os"
-// 	"osmosis_bridge/bridge/common"
+import (
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"osmosis_bridge/bridge/bifrost/thorclient"
+	"osmosis_bridge/bridge/common"
 
-// 	"github.com/cosmos/cosmos-sdk/codec"
-// 	"github.com/cosmos/cosmos-sdk/crypto/hd"
-// 	cKeys "github.com/cosmos/cosmos-sdk/crypto/keyring"
-// 	ctypes "github.com/cosmos/cosmos-sdk/types"
-// 	btypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-// 	rpcclient "github.com/tendermint/tendermint/rpc/client/http"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	cKeys "github.com/cosmos/cosmos-sdk/crypto/keyring"
+	ctypes "github.com/cosmos/cosmos-sdk/types"
+	btypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	rpcclient "github.com/tendermint/tendermint/rpc/client/http"
 
-// 	"github.com/rs/zerolog/log"
-// 	"gitlab.com/thorchain/thornode/bifrost/metrics"
-// 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/gaia/wasm"
-// 	"gitlab.com/thorchain/thornode/bifrost/thorclient"
+	"github.com/rs/zerolog/log"
 
-// 	"gitlab.com/thorchain/thornode/config"
+	"gitlab.com/thorchain/thornode/bifrost/metrics"
+	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/gaia/wasm"
 
-// 	"gitlab.com/thorchain/thornode/cmd"
-// 	. "gopkg.in/check.v1"
-// )
+	"gitlab.com/thorchain/thornode/config"
 
-// // -------------------------------------------------------------------------------------
-// // Mock FeeTx
-// // -------------------------------------------------------------------------------------
+	"gitlab.com/thorchain/thornode/cmd"
+	. "gopkg.in/check.v1"
+)
 
-// type MockFeeTx struct {
-// 	fee ctypes.Coins
-// 	gas uint64
-// }
+// -------------------------------------------------------------------------------------
+// Mock FeeTx
+// -------------------------------------------------------------------------------------
 
-// func (m *MockFeeTx) GetMsgs() []ctypes.Msg {
-// 	return nil
-// }
+type MockFeeTx struct {
+	fee ctypes.Coins
+	gas uint64
+}
 
-// func (m *MockFeeTx) ValidateBasic() error {
-// 	return nil
-// }
+func (m *MockFeeTx) GetMsgs() []ctypes.Msg {
+	return nil
+}
 
-// func (m *MockFeeTx) GetGas() uint64 {
-// 	return m.gas
-// }
+func (m *MockFeeTx) ValidateBasic() error {
+	return nil
+}
 
-// func (m *MockFeeTx) GetFee() ctypes.Coins {
-// 	return m.fee
-// }
+func (m *MockFeeTx) GetGas() uint64 {
+	return m.gas
+}
 
-// func (m *MockFeeTx) FeePayer() ctypes.AccAddress {
-// 	return nil
-// }
+func (m *MockFeeTx) GetFee() ctypes.Coins {
+	return m.fee
+}
 
-// func (m *MockFeeTx) FeeGranter() ctypes.AccAddress {
-// 	return nil
-// }
+func (m *MockFeeTx) FeePayer() ctypes.AccAddress {
+	return nil
+}
 
-// // -------------------------------------------------------------------------------------
-// // Tests
-// // -------------------------------------------------------------------------------------
+func (m *MockFeeTx) FeeGranter() ctypes.AccAddress {
+	return nil
+}
 
-// type BlockScannerTestSuite struct {
-// 	m      *metrics.Metrics
-// 	bridge thorclient.ThorchainBridge
-// 	keys   *thorclient.Keys
-// }
+// -------------------------------------------------------------------------------------
+// Tests
+// -------------------------------------------------------------------------------------
 
-// var _ = Suite(&BlockScannerTestSuite{})
+type BlockScannerTestSuite struct {
+	m      *metrics.Metrics
+	bridge thorclient.ThorchainBridge
+	keys   *thorclient.Keys
+}
 
-// func (s *BlockScannerTestSuite) SetUpSuite(c *C) {
-// 	s.m = GetMetricForTest(c)
-// 	c.Assert(s.m, NotNil)
-// 	cfg := config.BifrostClientConfiguration{
-// 		ChainID:         "thorchain",
-// 		ChainHost:       "localhost",
-// 		SignerName:      "bob",
-// 		SignerPasswd:    "password",
-// 		ChainHomeFolder: "",
-// 	}
+var _ = Suite(&BlockScannerTestSuite{})
 
-// 	kb := cKeys.NewInMemory()
-// 	_, _, err := kb.NewMnemonic(cfg.SignerName, cKeys.English, cmd.THORChainHDPath, cfg.SignerPasswd, hd.Secp256k1)
-// 	c.Assert(err, IsNil)
-// 	thorKeys := thorclient.NewKeysWithKeybase(kb, cfg.SignerName, cfg.SignerPasswd)
-// 	c.Assert(err, IsNil)
-// 	s.bridge, err = thorclient.NewThorchainBridge(cfg, s.m, thorKeys)
-// 	c.Assert(err, IsNil)
-// 	s.keys = thorKeys
-// }
+func (s *BlockScannerTestSuite) SetUpSuite(c *C) {
+	s.m = GetMetricForTest(c)
+	c.Assert(s.m, NotNil)
+	cfg := config.BifrostClientConfiguration{
+		ChainID:         "thorchain",
+		ChainHost:       "localhost",
+		SignerName:      "bob",
+		SignerPasswd:    "password",
+		ChainHomeFolder: "",
+	}
+
+	kb := cKeys.NewInMemory()
+	_, _, err := kb.NewMnemonic(cfg.SignerName, cKeys.English, cmd.THORChainHDPath, cfg.SignerPasswd, hd.Secp256k1)
+	c.Assert(err, IsNil)
+	thorKeys := thorclient.NewKeysWithKeybase(kb, cfg.SignerName, cfg.SignerPasswd)
+	c.Assert(err, IsNil)
+	s.bridge, err = thorclient.NewThorchainBridge(cfg, s.m, thorKeys)
+	c.Assert(err, IsNil)
+	s.keys = thorKeys
+}
 
 // func (s *BlockScannerTestSuite) TestCalculateAverageGasFees(c *C) {
 // 	cfg := config.BifrostBlockScannerConfiguration{ChainID: ConvertChain(common.OSMOSISChain), GasPriceResolution: 100_000}
@@ -168,65 +168,65 @@ package osmosis
 // 	c.Check(blockScanner.averageFee().String(), Equals, fmt.Sprintf("%d", uint64(10000*atomToThorchain)))
 // }
 
-// func (s *BlockScannerTestSuite) TestGetBlock(c *C) {
-// 	cfg := config.BifrostBlockScannerConfiguration{ChainID: ConvertChain(common.OSMOSISChain)}
-// 	mockRPC := NewMockTmServiceClient()
+func (s *BlockScannerTestSuite) TestGetBlock(c *C) {
+	cfg := config.BifrostBlockScannerConfiguration{ChainID: ConvertChain(common.OSMOSISChain)}
+	mockRPC := NewMockTmServiceClient()
 
-// 	blockScanner := CosmosBlockScanner{
-// 		cfg:       cfg,
-// 		tmService: mockRPC,
-// 	}
+	blockScanner := CosmosBlockScanner{
+		cfg:       cfg,
+		tmService: mockRPC,
+	}
 
-// 	block, err := blockScanner.GetBlock(1)
+	block, err := blockScanner.GetBlock(1)
 
-// 	c.Assert(err, IsNil)
-// 	c.Assert(len(block.Data.Txs), Equals, 1)
-// 	c.Assert(block.Header.Height, Equals, int64(6509672))
-// }
+	c.Assert(err, IsNil)
+	c.Assert(len(block.Data.Txs), Equals, 1)
+	c.Assert(block.Header.Height, Equals, int64(6509672))
+}
 
-// func (s *BlockScannerTestSuite) TestProcessTxs(c *C) {
-// 	cfg := config.BifrostBlockScannerConfiguration{ChainID: ConvertChain(common.OSMOSISChain)}
-// 	mockTmServiceClient := NewMockTmServiceClient()
+func (s *BlockScannerTestSuite) TestProcessTxs(c *C) {
+	cfg := config.BifrostBlockScannerConfiguration{ChainID: ConvertChain(common.OSMOSISChain)}
+	mockTmServiceClient := NewMockTmServiceClient()
 
-// 	registry := s.bridge.GetContext().InterfaceRegistry
-// 	registry.RegisterImplementations((*ctypes.Msg)(nil), &wasm.MsgExecuteContract{})
-// 	btypes.RegisterInterfaces(registry)
-// 	cdc := codec.NewProtoCodec(registry)
+	registry := s.bridge.GetContext().InterfaceRegistry
+	registry.RegisterImplementations((*ctypes.Msg)(nil), &wasm.MsgExecuteContract{})
+	btypes.RegisterInterfaces(registry)
+	cdc := codec.NewProtoCodec(registry)
 
-// 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		jsonFile, err := os.Open("./test-data/tx_results_by_height.json")
-// 		if err != nil {
-// 			c.Fatal("unable to load tx_results_by_height.json")
-// 		}
-// 		defer jsonFile.Close()
+	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		jsonFile, err := os.Open("./test-data/tx_results_by_height.json")
+		if err != nil {
+			c.Fatal("unable to load tx_results_by_height.json")
+		}
+		defer jsonFile.Close()
 
-// 		res, _ := io.ReadAll(jsonFile)
-// 		if _, err := w.Write(res); err != nil {
-// 			c.Fatal("unable to write /block_result", err)
-// 		}
-// 	})
-// 	server := httptest.NewServer(h)
-// 	defer server.Close()
+		res, _ := io.ReadAll(jsonFile)
+		if _, err := w.Write(res); err != nil {
+			c.Fatal("unable to write /block_result", err)
+		}
+	})
+	server := httptest.NewServer(h)
+	defer server.Close()
 
-// 	rpcClient, err := rpcclient.NewWithClient(server.URL, "/websocket", server.Client())
-// 	if err != nil {
-// 		c.Fatal("fail to create tendermint rpcclient")
-// 	}
+	rpcClient, err := rpcclient.NewWithClient(server.URL, "/websocket", server.Client())
+	if err != nil {
+		c.Fatal("fail to create tendermint rpcclient")
+	}
 
-// 	blockScanner := CosmosBlockScanner{
-// 		cfg:       cfg,
-// 		tmService: mockTmServiceClient,
-// 		txService: rpcClient,
-// 		cdc:       cdc,
-// 		logger:    log.Logger.With().Str("module", "blockscanner").Str("chain", common.OSMOSISChain.String()).Logger(),
-// 	}
+	blockScanner := CosmosBlockScanner{
+		cfg:       cfg,
+		tmService: mockTmServiceClient,
+		txService: rpcClient,
+		cdc:       cdc,
+		logger:    log.Logger.With().Str("module", "blockscanner").Str("chain", common.OSMOSISChain.String()).Logger(),
+	}
 
-// 	block, err := blockScanner.GetBlock(1)
-// 	c.Assert(err, IsNil)
+	block, err := blockScanner.GetBlock(1)
+	c.Assert(err, IsNil)
 
-// 	txInItems, err := blockScanner.processTxs(1, block.Data.Txs)
-// 	c.Assert(err, IsNil)
+	txInItems, err := blockScanner.processTxs(1, block.Data.Txs)
+	c.Assert(err, IsNil)
 
-// 	// proccessTxs should filter out everything besides the valid MsgSend
-// 	c.Assert(len(txInItems), Equals, 1)
-// }
+	// proccessTxs should filter out everything besides the valid MsgSend
+	c.Assert(len(txInItems), Equals, 1)
+}

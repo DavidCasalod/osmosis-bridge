@@ -6,7 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"osmosis_bridge/bridge/bifrost/blockscanner"
+	"osmosis_bridge/bridge/bifrost/thorclient"
 	"osmosis_bridge/bridge/bifrost/thorclient/types"
+	"osmosis_bridge/bridge/common"
 	"strconv"
 	"strings"
 	"time"
@@ -28,9 +30,6 @@ import (
 
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/gaia/wasm"
-	"gitlab.com/thorchain/thornode/bifrost/thorclient"
-
-	"gitlab.com/thorchain/thornode/common"
 
 	"gitlab.com/thorchain/thornode/common/cosmos"
 	"gitlab.com/thorchain/thornode/config"
@@ -194,10 +193,20 @@ func (c *CosmosBlockScanner) updateGasCache(tx ctypes.FeeTx) {
 	if len(fees) != 1 {
 		return
 	}
+	// Temporal chainID
+	tempChainID := c.cfg.ChainID
+
+	// Check if ChainID is "OSMOSIS", change it to "GAIA"
+	if tempChainID == "OSMOSIS" {
+		tempChainID = "GAIA"
+	}
+	//  tempChainID to call GetGasAsset
+	gasAsset := tempChainID.GetGasAsset()
+	tempChainID = c.cfg.ChainID
 
 	// only consider transactions with fee paid in uatom
 	coin, err := fromCosmosToThorchain(fees[0])
-	if err != nil || !coin.Asset.Equals(ConvertToOsmoAsset(c.cfg.ChainID.GetGasAsset())) {
+	if err != nil || !coin.Asset.Equals(ConvertToOsmoAsset(gasAsset)) {
 		return
 	}
 
@@ -342,7 +351,7 @@ func (c *CosmosBlockScanner) processTxs(height int64, rawTxs [][]byte) ([]types.
 						c.logger.Debug().Err(err).Interface("coins", c).Msg("unable to convert coin, not whitelisted. skipping...")
 						continue
 					}
-					coins = append(coins, ConvertToThorCoin(cCoin))
+					coins = append(coins, cCoin)
 				}
 
 				// Ignore the tx when no coins exist
@@ -358,12 +367,12 @@ func (c *CosmosBlockScanner) processTxs(height int64, rawTxs [][]byte) ([]types.
 						c.logger.Debug().Err(err).Interface("fees", fees).Msg("unable to convert coin, not whitelisted. skipping...")
 						continue
 					}
-					gasFees = append(gasFees, ConvertToThorCoin(cCoin))
+					gasFees = append(gasFees, cCoin)
 				}
 				// THORChain only supports gas paid in ATOM, if gas is paid in another asset
 				// then fake gas as `0.000001 ATOM`, the fee is not used but cannot be empty
 				if gasFees.IsEmpty() {
-					gasFees = append(gasFees, common.NewCoin(c.cfg.ChainID.GetGasAsset(), cosmos.NewUint(1)))
+					gasFees = append(gasFees, common.NewCoin(ConvertToOsmoAsset(c.cfg.ChainID.GetGasAsset()), cosmos.NewUint(1)))
 				}
 				txIn = append(txIn, types.TxInItem{
 					Tx:          hash,
@@ -400,7 +409,7 @@ func (c *CosmosBlockScanner) FetchTxs(height, chainHeight int64) (types.TxIn, er
 
 	txIn := types.TxIn{
 		Count:    strconv.Itoa(len(txs)),
-		Chain:    c.cfg.ChainID,
+		Chain:    common.Chain(c.cfg.ChainID),
 		TxArray:  txs,
 		Filtered: false,
 		MemPool:  false,

@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"osmosis_bridge/bridge/bifrost/blockscanner"
+	"osmosis_bridge/bridge/bifrost/pkg/chainclients/shared/runners"
+	"osmosis_bridge/bridge/bifrost/thorclient"
 	stypes "osmosis_bridge/bridge/bifrost/thorclient/types"
 	"osmosis_bridge/bridge/bifrost/tss"
 
@@ -32,9 +34,8 @@ import (
 	"github.com/tendermint/tendermint/crypto"
 
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
-	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/shared/runners"
+
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/shared/signercache"
-	"gitlab.com/thorchain/thornode/bifrost/thorclient"
 
 	thorCommon "gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
@@ -593,7 +594,7 @@ func (c *OsmosisClient) OnObservedTxIn(txIn stypes.TxInItem, blockHeight int64) 
 	if m.GetTxID().IsEmpty() {
 		return
 	}
-	if err := c.signerCacheManager.SetSigned(txIn.CacheHash(thorCommon.Chain(c.GetChain()), m.GetTxID().String()), txIn.Tx); err != nil {
+	if err := c.signerCacheManager.SetSigned(txIn.CacheHash(c.GetChain(), m.GetTxID().String()), txIn.Tx); err != nil {
 		c.logger.Err(err).Msg("fail to update signer cache")
 	}
 }

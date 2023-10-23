@@ -3,10 +3,9 @@ package common
 import (
 	"errors"
 	"fmt"
+	"osmosis_bridge/bridge/common/cosmos"
 	"sort"
 	"strings"
-
-	"gitlab.com/thorchain/thornode/common/cosmos"
 )
 
 // THORChainDecimals indicate the number of decimal points used in THORChain

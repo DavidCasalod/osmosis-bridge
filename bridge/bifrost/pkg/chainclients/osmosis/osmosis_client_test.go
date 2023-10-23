@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"osmosis_bridge/bridge/bifrost/thorclient"
+	"osmosis_bridge/bridge/common"
 	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
-
-	"osmosis_bridge/bridge/common"
 
 	stypes "osmosis_bridge/bridge/bifrost/thorclient/types"
 
@@ -24,7 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	btypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
-	"gitlab.com/thorchain/thornode/bifrost/thorclient"
+
 	"gitlab.com/thorchain/thornode/cmd"
 	thorCommon "gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"

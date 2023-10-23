@@ -3,6 +3,7 @@ package blockscanner
 import (
 	"errors"
 	"fmt"
+	"osmosis_bridge/bridge/bifrost/thorclient"
 	"osmosis_bridge/bridge/bifrost/thorclient/types"
 	"sync"
 	"sync/atomic"
@@ -14,7 +15,6 @@ import (
 
 	btypes "gitlab.com/thorchain/thornode/bifrost/blockscanner/types"
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
-	"gitlab.com/thorchain/thornode/bifrost/thorclient"
 
 	"gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/config"
