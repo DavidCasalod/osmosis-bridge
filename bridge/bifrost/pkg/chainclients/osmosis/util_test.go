@@ -14,13 +14,13 @@ var _ = Suite(&UtilTestSuite{})
 func (s *UtilTestSuite) SetUpSuite(c *C) {}
 
 func (s *UtilTestSuite) TestFromCosmosToThorchain(c *C) {
-	// 5 ATOM, 6 decimals
-	cosmosCoin := cosmos.NewCoin("uatom", ctypes.NewInt(5000000))
+	// 5 OSMO, 6 decimals
+	cosmosCoin := cosmos.NewCoin("uosmo", ctypes.NewInt(5000000))
 	thorchainCoin, err := fromCosmosToThorchain(cosmosCoin)
 	c.Assert(err, IsNil)
 
-	// 5 ATOM, 8 decimals
-	expectedThorchainAsset, err := common.NewAsset("OSMOSIS.ATOM")
+	// 5 OSMO, 8 decimals
+	expectedThorchainAsset, err := common.NewAsset("OSMOSIS.OSMO")
 	c.Assert(err, IsNil)
 	expectedThorchainAmount := ctypes.NewUint(500000000)
 	c.Check(thorchainCoin.Asset.Equals(ConvertToOsmoAsset(expectedThorchainAsset)), Equals, true)
@@ -29,8 +29,8 @@ func (s *UtilTestSuite) TestFromCosmosToThorchain(c *C) {
 }
 
 func (s *UtilTestSuite) TestFromThorchainToCosmos(c *C) {
-	// 6 OSMOSIS.ATOM, 8 decimals
-	thorchainAsset, err := common.NewAsset("OSMOSIS.ATOM")
+	// 6 OSMOSIS.OSMO, 8 decimals
+	thorchainAsset, err := common.NewAsset("OSMOSIS.OSMO")
 	c.Assert(err, IsNil)
 	thorchainCoin := common.Coin{
 		Asset:    thorchainAsset,
@@ -40,8 +40,8 @@ func (s *UtilTestSuite) TestFromThorchainToCosmos(c *C) {
 	cosmosCoin, err := fromThorchainToCosmos(ConvertToOsmCoin(thorchainCoin))
 	c.Assert(err, IsNil)
 
-	// 6 uatom, 6 decimals
-	expectedCosmosDenom := "uatom"
+	// 6 uosmo, 6 decimals
+	expectedCosmosDenom := "uosmo"
 	expectedCosmosAmount := int64(6000000)
 	c.Check(cosmosCoin.Denom, Equals, expectedCosmosDenom)
 	c.Check(cosmosCoin.Amount.Int64(), Equals, expectedCosmosAmount)

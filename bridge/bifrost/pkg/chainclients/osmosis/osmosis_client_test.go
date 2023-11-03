@@ -7,10 +7,13 @@ import (
 	"os"
 	"osmosis_bridge/bridge/bifrost/thorclient"
 	"osmosis_bridge/bridge/common"
+	"osmosis_bridge/bridge/common/cosmos"
 	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
+
+	"gitlab.com/thorchain/thornode/config"
 
 	stypes "osmosis_bridge/bridge/bifrost/thorclient/types"
 
@@ -27,8 +30,7 @@ import (
 
 	"gitlab.com/thorchain/thornode/cmd"
 	thorCommon "gitlab.com/thorchain/thornode/common"
-	"gitlab.com/thorchain/thornode/common/cosmos"
-	"gitlab.com/thorchain/thornode/config"
+
 	. "gopkg.in/check.v1"
 )
 
@@ -105,10 +107,12 @@ func (s *CosmosTestSuite) TestGetAddress(c *C) {
 		accountClient: mockAccountServiceClient,
 	}
 
-	addr := "cosmos10tjz4ave7znpctgd2rfu6v2r6zkeup2dlmqtuz"
-	atom, _ := common.NewAsset("OSMOSIS.ATOM")
+	// addr := "cosmos10tjz4ave7znpctgd2rfu6v2r6zkeup2dlmqtuz"
+	addr := "osmo1dcefmny39l3qpc6uhw38dh2js6ppyd8un5kg93"
+
+	osmo, _ := common.NewAsset("OSMOSIS.OSMO")
 	expectedCoins := common.NewCoins(
-		common.NewCoin(atom, cosmos.NewUint(496694100)),
+		common.NewCoin(osmo, cosmos.NewUint(496694100)),
 	)
 
 	acc, err := cc.GetAccountByAddress(addr, big.NewInt(0))
@@ -116,8 +120,14 @@ func (s *CosmosTestSuite) TestGetAddress(c *C) {
 	c.Check(acc.AccountNumber, Equals, int64(3530305))
 	c.Check(acc.Sequence, Equals, int64(3))
 	c.Check(acc.Coins.Equals_deprecated(expectedCoins), Equals, true)
+	c.Logf("Actual Coins: %v", acc.Coins)
+	c.Logf("Expected Coins: %v", expectedCoins)
 
-	pk := common.PubKey("sthorpub1addwnpepqf72ur2e8zk8r5augtrly40cuy94f7e663zh798tyms6pu2k8qdswf4es66")
+	// pk := common.PubKey("sthorpub1addwnpepqf72ur2e8zk8r5augtrly40cuy94f7e663zh798tyms6pu2k8qdswf4es66")
+	pkString := "sthorpub1addwnpepqdhtvg47uw9sc95qvlqsqk682m9re3jk6hsdha7nc62f5t0qu52j54muw8w"
+
+	pk := common.PubKey(pkString)
+
 	acc, err = cc.GetAccount(pk, big.NewInt(0))
 	c.Assert(err, IsNil)
 	c.Check(acc.AccountNumber, Equals, int64(3530305))
@@ -144,11 +154,11 @@ func (s *CosmosTestSuite) TestProcessOutboundTx(c *C) {
 	}, nil, s.bridge, s.m)
 	c.Assert(err, IsNil)
 
-	vaultPubKey, err := common.NewPubKey("sthorpub1addwnpepqda0q2avvxnferqasee42lu5492jlc4zvf6u264famvg9dywgq2kz0zaecw")
+	vaultPubKey, err := common.NewPubKey("sthorpub1addwnpepqdhtvg47uw9sc95qvlqsqk682m9re3jk6hsdha7nc62f5t0qu52j54muw8w")
 	c.Assert(err, IsNil)
-	outAsset, err := common.NewAsset("OSMOSIS.ATOM")
+	outAsset, err := common.NewAsset("OSMOSIS.OSMO")
 	c.Assert(err, IsNil)
-	toAddress, err := common.NewAddress("cosmos10tjz4ave7znpctgd2rfu6v2r6zkeup2dlmqtuz")
+	toAddress, err := common.NewAddress("osmo1dcefmny39l3qpc6uhw38dh2js6ppyd8un5kg93")
 	c.Assert(err, IsNil)
 	txOut := stypes.TxOutItem{
 		Chain:       common.OSMOSISChain,
@@ -165,11 +175,11 @@ func (s *CosmosTestSuite) TestProcessOutboundTx(c *C) {
 	c.Assert(err, IsNil)
 
 	expectedAmount := int64(245283)
-	expectedDenom := "uatom"
+	expectedDenom := "uosmo"
 	c.Check(msg.Amount[0].Amount.Int64(), Equals, expectedAmount)
 	c.Check(msg.Amount[0].Denom, Equals, expectedDenom)
 	c.Logf(msg.FromAddress)
-	c.Check(msg.FromAddress, Equals, "cosmos126kpfewtlc7agqjrwdl2wfg0txkphsawus338n")
+	c.Check(msg.FromAddress, Equals, "osmo1dcefmny39l3qpc6uhw38dh2js6ppyd8un5kg93")
 	c.Check(msg.ToAddress, Equals, toAddress.String())
 }
 
@@ -214,9 +224,9 @@ func (s *CosmosTestSuite) TestSign(c *C) {
 
 	vaultPubKey, err := common.NewPubKey(pk.String())
 	c.Assert(err, IsNil)
-	outAsset, err := common.NewAsset("OSMOSIS.ATOM")
+	outAsset, err := common.NewAsset("OSMOSIS.OSMO")
 	c.Assert(err, IsNil)
-	toAddress, err := common.NewAddress("cosmos10tjz4ave7znpctgd2rfu6v2r6zkeup2dlmqtuz")
+	toAddress, err := common.NewAddress("osmo1dcefmny39l3qpc6uhw38dh2js6ppyd8un5kg93")
 	c.Assert(err, IsNil)
 	txOut := stypes.TxOutItem{
 		Chain:       (common.OSMOSISChain),
@@ -236,7 +246,7 @@ func (s *CosmosTestSuite) TestSign(c *C) {
 	c.Check(meta.AccountNumber, Equals, int64(0))
 	c.Check(meta.SeqNumber, Equals, int64(0))
 
-	gas := types.NewCoins(types.NewCoin("uatom", types.NewInt(100)))
+	gas := types.NewCoins(types.NewCoin("uosmo", types.NewInt(100)))
 
 	txb, err := buildUnsigned(
 		txConfig,

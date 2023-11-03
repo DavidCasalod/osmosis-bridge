@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"gitlab.com/thorchain/thornode/config"
+
 	"osmosis_bridge/bridge/bifrost/blockscanner"
 	"osmosis_bridge/bridge/bifrost/pkg/chainclients/shared/runners"
 	"osmosis_bridge/bridge/bifrost/thorclient"
@@ -39,7 +41,7 @@ import (
 
 	thorCommon "gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
-	"gitlab.com/thorchain/thornode/config"
+
 	"gitlab.com/thorchain/thornode/constants"
 	memo "gitlab.com/thorchain/thornode/x/thorchain/memo"
 	tssp "gitlab.com/thorchain/tss/go-tss/tss"

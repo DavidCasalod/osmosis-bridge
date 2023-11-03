@@ -4,6 +4,8 @@ import (
 	"osmosis_bridge/bridge/common"
 	"time"
 
+	"gitlab.com/thorchain/thornode/config"
+
 	"github.com/rs/zerolog/log"
 	"gitlab.com/thorchain/tss/go-tss/tss"
 
@@ -13,8 +15,6 @@ import (
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/shared/types"
 	"gitlab.com/thorchain/thornode/bifrost/pubkeymanager"
 	"gitlab.com/thorchain/thornode/bifrost/thorclient"
-
-	"gitlab.com/thorchain/thornode/config"
 )
 
 // ChainClient exports the shared type.

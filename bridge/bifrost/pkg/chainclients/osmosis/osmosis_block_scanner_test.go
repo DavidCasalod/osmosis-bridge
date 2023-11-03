@@ -19,7 +19,6 @@ import (
 
 	"gitlab.com/thorchain/thornode/bifrost/metrics"
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/gaia/wasm"
-
 	"gitlab.com/thorchain/thornode/config"
 
 	"gitlab.com/thorchain/thornode/cmd"
@@ -100,14 +99,14 @@ func (s *BlockScannerTestSuite) SetUpSuite(c *C) {
 
 // 	blockScanner.updateGasCache(&MockFeeTx{
 // 		gas: GasLimit / 2,
-// 		fee: ctypes.Coins{ctypes.NewCoin("uatom", ctypes.NewInt(10000))},
+// 		fee: ctypes.Coins{ctypes.NewCoin("uosmo", ctypes.NewInt(10000))},
 // 	})
 // 	c.Check(len(blockScanner.feeCache), Equals, 1)
 // 	c.Check(blockScanner.averageFee().String(), Equals, fmt.Sprintf("%d", uint64(20000*atomToThorchain)))
 
 // 	blockScanner.updateGasCache(&MockFeeTx{
 // 		gas: GasLimit / 2,
-// 		fee: ctypes.Coins{ctypes.NewCoin("uatom", ctypes.NewInt(10000))},
+// 		fee: ctypes.Coins{ctypes.NewCoin("uosmo", ctypes.NewInt(10000))},
 // 	})
 // 	c.Check(len(blockScanner.feeCache), Equals, 2)
 // 	c.Check(blockScanner.averageFee().String(), Equals, fmt.Sprintf("%d", uint64(20000*atomToThorchain)))
@@ -115,11 +114,11 @@ func (s *BlockScannerTestSuite) SetUpSuite(c *C) {
 // 	// two blocks at half fee should average to 75% of last
 // 	blockScanner.updateGasCache(&MockFeeTx{
 // 		gas: GasLimit,
-// 		fee: ctypes.Coins{ctypes.NewCoin("uatom", ctypes.NewInt(10000))},
+// 		fee: ctypes.Coins{ctypes.NewCoin("uosmo", ctypes.NewInt(10000))},
 // 	})
 // 	blockScanner.updateGasCache(&MockFeeTx{
 // 		gas: GasLimit,
-// 		fee: ctypes.Coins{ctypes.NewCoin("uatom", ctypes.NewInt(10000))},
+// 		fee: ctypes.Coins{ctypes.NewCoin("uosmo", ctypes.NewInt(10000))},
 // 	})
 // 	c.Check(len(blockScanner.feeCache), Equals, 4)
 // 	c.Check(blockScanner.averageFee().String(), Equals, fmt.Sprintf("%d", uint64(15000*atomToThorchain)))
@@ -128,14 +127,14 @@ func (s *BlockScannerTestSuite) SetUpSuite(c *C) {
 // 	blockScanner.updateGasCache(&MockFeeTx{
 // 		gas: GasLimit,
 // 		fee: ctypes.Coins{
-// 			ctypes.NewCoin("uatom", ctypes.NewInt(10000)),
+// 			ctypes.NewCoin("uosmo", ctypes.NewInt(10000)),
 // 			ctypes.NewCoin("uusd", ctypes.NewInt(10000)),
 // 		},
 // 	})
 // 	c.Check(len(blockScanner.feeCache), Equals, 4)
 // 	c.Check(blockScanner.averageFee().String(), Equals, fmt.Sprintf("%d", uint64(15000*atomToThorchain)))
 
-// 	// skip transactions with fees not in uatom
+// 	// skip transactions with fees not in uosmo
 // 	blockScanner.updateGasCache(&MockFeeTx{
 // 		gas: GasLimit,
 // 		fee: ctypes.Coins{
@@ -160,7 +159,7 @@ func (s *BlockScannerTestSuite) SetUpSuite(c *C) {
 // 		blockScanner.updateGasCache(&MockFeeTx{
 // 			gas: GasLimit,
 // 			fee: ctypes.Coins{
-// 				ctypes.NewCoin("uatom", ctypes.NewInt(10000)),
+// 				ctypes.NewCoin("uosmo", ctypes.NewInt(10000)),
 // 			},
 // 		})
 // 	}

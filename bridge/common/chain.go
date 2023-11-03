@@ -271,8 +271,10 @@ func (c Chain) AddressPrefix(cn ChainNetwork) string {
 			return btypes.ProdNetwork.Bech32Prefixes()
 		case TERRAChain:
 			return "terra"
-		case GAIAChain, OSMOSISChain:
+		case GAIAChain:
 			return "cosmos"
+		case OSMOSISChain:
+			return "osmo"
 		case THORChain:
 			return types.GetConfig().GetBech32AccountAddrPrefix()
 		case BTCChain:

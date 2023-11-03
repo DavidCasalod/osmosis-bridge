@@ -3,10 +3,11 @@ package types
 import (
 	"math/big"
 
+	"gitlab.com/thorchain/thornode/config"
+
 	"gitlab.com/thorchain/thornode/bifrost/thorclient/types"
 	stypes "gitlab.com/thorchain/thornode/bifrost/thorclient/types"
 	"gitlab.com/thorchain/thornode/common"
-	"gitlab.com/thorchain/thornode/config"
 )
 
 // ChainClient is the interface for chain clients.

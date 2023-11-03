@@ -31,6 +31,7 @@ import (
 	"gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
 	"gitlab.com/thorchain/thornode/config"
+
 	types2 "gitlab.com/thorchain/thornode/x/thorchain/types"
 )
 

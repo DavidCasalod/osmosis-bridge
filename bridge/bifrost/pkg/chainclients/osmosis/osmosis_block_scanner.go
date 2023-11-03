@@ -13,6 +13,8 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.com/thorchain/thornode/config"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -32,7 +34,6 @@ import (
 	"gitlab.com/thorchain/thornode/bifrost/pkg/chainclients/gaia/wasm"
 
 	"gitlab.com/thorchain/thornode/common/cosmos"
-	"gitlab.com/thorchain/thornode/config"
 )
 
 // SolvencyReporter is to report solvency info to THORNode
@@ -193,20 +194,25 @@ func (c *CosmosBlockScanner) updateGasCache(tx ctypes.FeeTx) {
 	if len(fees) != 1 {
 		return
 	}
-	// Temporal chainID
-	tempChainID := c.cfg.ChainID
+	// // Temporal chainID
+	// tempChainID := c.cfg.ChainID
 
-	// Check if ChainID is "OSMOSIS", change it to "GAIA"
-	if tempChainID == "OSMOSIS" {
-		tempChainID = "GAIA"
-	}
-	//  tempChainID to call GetGasAsset
-	gasAsset := tempChainID.GetGasAsset()
-	tempChainID = c.cfg.ChainID
+	// // Check if ChainID is "OSMOSIS", change it to "GAIA"
+	// if tempChainID == "OSMOSIS" {
+	// 	tempChainID = "GAIA"
+	// }
+	// //  tempChainID to call GetGasAsset
+	// gasAsset := tempChainID.GetGasAsset()
+	// tempChainID = c.cfg.ChainID
 
+	// // only consider transactions with fee paid in uatom
+	// coin, err := fromCosmosToThorchain(fees[0])
+	// if err != nil || !coin.Asset.Equals(ConvertToOsmoAsset(gasAsset)) {
+	// 	return
+	// }
 	// only consider transactions with fee paid in uatom
 	coin, err := fromCosmosToThorchain(fees[0])
-	if err != nil || !coin.Asset.Equals(ConvertToOsmoAsset(gasAsset)) {
+	if err != nil || !coin.Asset.Equals(ConvertToOsmoAsset(c.cfg.ChainID.GetGasAsset())) {
 		return
 	}
 
@@ -346,6 +352,9 @@ func (c *CosmosBlockScanner) processTxs(height int64, rawTxs [][]byte) ([]types.
 				// Convert cosmos coins to thorchain coins (taking into account asset decimal precision)
 				coins := common.Coins{}
 				for _, coin := range msg.Amount {
+					if coin.Denom == "uatom" {
+						coin.Denom = "uosmo"
+					}
 					cCoin, err := fromCosmosToThorchain(coin)
 					if err != nil {
 						c.logger.Debug().Err(err).Interface("coins", c).Msg("unable to convert coin, not whitelisted. skipping...")

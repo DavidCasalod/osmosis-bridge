@@ -3,6 +3,8 @@ package evm
 import (
 	"math/big"
 
+	"gitlab.com/thorchain/thornode/config"
+
 	"github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	cKeys "github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -14,7 +16,7 @@ import (
 	"gitlab.com/thorchain/thornode/bifrost/tss"
 	"gitlab.com/thorchain/thornode/cmd"
 	"gitlab.com/thorchain/thornode/common"
-	"gitlab.com/thorchain/thornode/config"
+
 	"gitlab.com/thorchain/thornode/x/thorchain/types"
 )
 

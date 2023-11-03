@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"osmosis_bridge/bridge/common"
+	"osmosis_bridge/bridge/common/cosmos"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	ctypes "github.com/cosmos/cosmos-sdk/types"
@@ -15,7 +16,7 @@ import (
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/gogo/protobuf/proto"
 	thorCommon "gitlab.com/thorchain/thornode/common"
-	"gitlab.com/thorchain/thornode/common/cosmos"
+
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"

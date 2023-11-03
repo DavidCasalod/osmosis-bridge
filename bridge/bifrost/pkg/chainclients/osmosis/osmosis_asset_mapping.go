@@ -12,9 +12,9 @@ type CosmosAssetMapping struct {
 // CHANGEME: define assets that should be observed by THORChain here. This also acts a whitelist.
 var CosmosAssetMappings = []CosmosAssetMapping{
 	{
-		CosmosDenom:     "uatom",
+		CosmosDenom:     "uosmo",
 		CosmosDecimals:  6,
-		THORChainSymbol: "ATOM",
+		THORChainSymbol: "OSMO",
 	},
 }
 

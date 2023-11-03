@@ -17,10 +17,12 @@ import (
 
 	"osmosis_bridge/bridge/bifrost/thorclient"
 
+	"gitlab.com/thorchain/thornode/config"
+
 	"gitlab.com/thorchain/thornode/cmd"
 	"gitlab.com/thorchain/thornode/common"
 	"gitlab.com/thorchain/thornode/common/cosmos"
-	"gitlab.com/thorchain/thornode/config"
+
 	"gitlab.com/thorchain/thornode/constants"
 	"gitlab.com/thorchain/thornode/x/thorchain/types"
 )
